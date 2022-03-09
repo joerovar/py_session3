@@ -28,6 +28,8 @@ from sklearn.linear_model import LogisticRegression
 data = pd.read_csv('loan_dataset.csv', header=0)
 data = data.dropna()
 print(list(data.columns))
+
+# SET VARIABLES AS BINARY
 data['education']=np.where(data['education'] =='basic.9y', 'Basic', data['education'])
 data['education']=np.where(data['education'] =='basic.6y', 'Basic', data['education'])
 data['education']=np.where(data['education'] =='basic.4y', 'Basic', data['education'])
@@ -41,6 +43,7 @@ data_vars=data.columns.values.tolist()
 to_keep=[i for i in data_vars if i not in cat_vars]
 data_final=data[to_keep]
 
+# LOGISTIC REGRESSION
 X = data_final.loc[:, data_final.columns != 'y']
 y = data_final.loc[:, data_final.columns == 'y']
 # os = SMOTE(random_state=0)
@@ -54,11 +57,13 @@ logit_model=sm.Logit(y,X)
 result=logit_model.fit()
 print(result.summary2())
 
+
 logreg = LogisticRegression()
 logreg.fit(X_train, y_train)
 # y_pred = logreg.predict(X_test)
 print('Accuracy of logistic regression classifier on test set: {:.2f}'.format(logreg.score(X_test, y_test)))
 
+# K-FOLD CROSS VALIDATION
 logreg2 = LogisticRegression()
 scores = cross_val_score(logreg2, X, y, cv=5)
 print(scores)
