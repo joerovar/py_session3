@@ -29,34 +29,36 @@ data = pd.read_csv('loan_dataset.csv', header=0)
 data = data.dropna()
 print(list(data.columns))
 
-# SET VARIABLES AS BINARY
-data['education']=np.where(data['education'] =='basic.9y', 'Basic', data['education'])
-data['education']=np.where(data['education'] =='basic.6y', 'Basic', data['education'])
-data['education']=np.where(data['education'] =='basic.4y', 'Basic', data['education'])
-cat_vars=['job','marital','education','default','housing','loan','contact','month','day_of_week','poutcome']
+# CONSOLIDATE CATEGORIES
+data['education'] = np.where(data['education'] == 'basic.9y', 'Basic', data['education'])
+data['education'] = np.where(data['education'] == 'basic.6y', 'Basic', data['education'])
+data['education'] = np.where(data['education'] == 'basic.4y', 'Basic', data['education'])
+cat_vars = ['job', 'marital', 'education', 'default', 'housing', 'loan', 'contact', 'month', 'day_of_week',
+            'poutcome']
 for var in cat_vars:
-    cat_list='var'+'_'+var
     cat_list = pd.get_dummies(data[var], prefix=var)
-    data1=data.join(cat_list)
-    data=data1
-data_vars=data.columns.values.tolist()
-to_keep=[i for i in data_vars if i not in cat_vars]
-data_final=data[to_keep]
+    # print(data[var])
+    # print(cat_list)
+    data1 = data.join(cat_list)
+    data = data1
+data_vars = data.columns.values.tolist()
+to_keep = [i for i in data_vars if i not in cat_vars]
+data_final = data[to_keep]
 
 # LOGISTIC REGRESSION
 X = data_final.loc[:, data_final.columns != 'y']
 y = data_final.loc[:, data_final.columns == 'y']
+
 # os = SMOTE(random_state=0)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-cols=['euribor3m', 'job_blue-collar', 'job_housemaid', 'marital_unknown', 'education_illiterate',
-      'month_apr', 'month_aug', 'month_dec', 'month_jul', 'month_jun', 'month_mar',
-      'month_may', 'month_nov', 'month_oct', "poutcome_failure", "poutcome_success"]
-X=X_train[cols]
-y=y_train['y']
-logit_model=sm.Logit(y,X)
-result=logit_model.fit()
+cols = ['euribor3m', 'job_blue-collar', 'job_housemaid', 'marital_unknown', 'education_illiterate',
+        'month_apr', 'month_aug', 'month_dec', 'month_jul', 'month_jun', 'month_mar',
+        'month_may', 'month_nov', 'month_oct', "poutcome_failure", "poutcome_success"]
+X = X_train[cols]
+y = y_train['y']
+logit_model = sm.Logit(y, X)
+result = logit_model.fit()
 print(result.summary2())
-
 
 logreg = LogisticRegression()
 logreg.fit(X_train, y_train)
